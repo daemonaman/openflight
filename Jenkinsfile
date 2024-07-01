@@ -1,22 +1,11 @@
 pipeline{
 	agent any
-
-	environment{
-	     BITBUCKET_CREDENTIALS = credentials('new')
-	     REPO_URL = 'https://rahulkajla2000@bitbucket.org/simanchalalearning/onlyproperty-login-backend.git'
-	     }
-
-	stages{
-		stage('Checkout'){
+	stages {
+		stage ("pull code from git repo"){
 			steps{
-				script{
-					checkout([$class: 'GitSCM',
-						  branches: [[name: '*/main']],
-						  userRemoteConfigs: [[url: "${env.REPO_URL}", credentialsID: "${env.BITBUCKET_CREDENTIALS}"]]
-					])
-				}
-			      }
-			   }
+				git branch: 'main', url: 'https://github.com/Rahuljat17/onlyproperty-login-backend.git'
+			}
+		}
 
 		stage('Build'){
 			steps{
@@ -41,8 +30,8 @@ pipeline{
 		}
 		stage ("Prod ENV"){
 			steps{
-				sshagent(credentials:['node-1']) {
-			    	 	sh 'ssh -o StrictHostKeyChecking=no ubuntu@34.72.81.81 sudo docker run  -dit  -p  :8080  rahul9664/java-app:$BUILD_TAG'
+				sshagent(credentials:['onlyproperty-login-backend-ssh']) {
+			    	 	sh 'ssh -o StrictHostKeyChecking=no rahulkajla2000@34.132.46.200 sudo docker run  -dit  -p  :8080  rahul9664/onlyproperty:$BUILD_TAG'
 				}
 			}
 		}
