@@ -31,13 +31,5 @@ pipeline {
 				sh 'sudo docker run -dit --name testing$BUILD_TAG -p 8090:8080 rahul9664/onlyproperty:$BUILD_TAG'
 			}
 		}
-		
-		stage ("Prod ENV"){
-			steps{
-				sshagent(credentials:['any']) {
-			    	 	sh 'ssh -o StrictHostKeyChecking=no rahulkajla2000@34.41.123.89 sudo docker run  -dit  -p  :8080  rahul9664/onlyproperty:$BUILD_TAG'
-				}
-			}
-		}
 	}
 }
