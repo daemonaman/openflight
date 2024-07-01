@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN mongodb
 
 # Copy the rest of the code
 COPY . .
