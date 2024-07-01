@@ -10,7 +10,6 @@ pipeline {
 		stage ("Build the code"){
 			steps{
 				sh 'npm install'
-                                sh 'npm build'
 			}
 		}
 		stage ("Building docker image"){
