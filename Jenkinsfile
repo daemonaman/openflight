@@ -28,7 +28,16 @@ pipeline {
 		}
 		stage ("Testing the Build"){
 			steps{
-				sh 'sudo docker run -dit --name testing$BUILD_TAG -p 8090:8080 rahul9664/onlyproperty:$BUILD_TAG'
+				sh 'sudo docker run -dit --name testing$BUILD_TAG -p 3000:3000 rahul9664/onlyproperty:$BUILD_TAG'
+			}
+		}
+		stage ("QAT Testing"){
+			steps{
+				retry(7){
+					script{
+						sh 'sudo curl --silent http://34.72.81.81:3000'
+					}
+				}
 			}
 		}
 	}
