@@ -1,10 +1,9 @@
-
 pipeline {
 	agent any
 	stages {
 		stage ("pull code from git repo"){
 			steps{
-				git branch: 'main', url: 'https://github.com/Rahuljat17/onlyproperty-login-backend.git'
+				 git branch: 'main', credentialsId: 'jj', url: 'https://github.com/daemonaman/openflight.git'
 			}
 		}
 		stage ("Build the code"){
@@ -12,32 +11,36 @@ pipeline {
 				sh 'npm install'
 			}
 		}
+        stage('Remove Old Containers and Images') {
+            steps {
+                script {
+                    sh '''
+                    sudo docker stop onlyproperty-login-backend || true
+                    sudo docker rm onlyproperty-login-backend || true
+                    '''
+                    sh '''
+                    sudo docker rmi daemonaman/onlyproperty-login-backend:latest || true
+                    '''
+                }
+            }
+        }
+
 		stage ("Building docker image"){
 			steps{
-				sh 'sudo docker build -t onlyproperty:$BUILD_TAG .'
-				sh 'sudo docker tag onlyproperty:$BUILD_TAG rahul9664/onlyproperty:$BUILD_TAG '
+				sh 'sudo docker build -t daemonaman/onlyproperty-login-backend:latest .'
 			}
 		}
 		stage ("Push on Docker-Hub"){
 			steps{
-				withCredentials([string(credentialsId: 'docker_hub_id', variable: 'docker_hub_passwd')]) {
-    					sh 'sudo docker login -u rahul9664 -p ${docker_hub_passwd}'
-					sh 'sudo docker push rahul9664/onlyproperty:$BUILD_TAG'
+				withCredentials([string(credentialsId:  'docker_hub_id1', variable: 'docker_hub_var')]) {
+    					sh 'sudo docker login -u daemonaman -p ${docker_hub_var}'
+					sh 'sudo docker push daemonaman/onlyproperty-login-backend'
 				}
 			}
 		}
 		stage ("Testing the Build"){
 			steps{
-				sh 'sudo docker run -dit --name testing$BUILD_TAG -p 3000:3000 rahul9664/onlyproperty:$BUILD_TAG'
-			}
-		}
-		stage ("QAT Testing"){
-			steps{
-				retry(7){
-					script{
-						sh 'sudo curl --silent http://34.72.81.81:3000'
-					}
-				}
+				sh 'sudo docker run -dit --name onlyproperty-login-backend -p 3000:3000 daemonaman/onlyproperty-login-backend:latest'
 			}
 		}
 	}
